@@ -1,6 +1,6 @@
 {
   "name": "test-creep-coffee",
-  "version": "0.0.4",
+  "version": "1.0.0",
   "description": "Selective test execution",
   "engines": {
     "node": ">=0.4.0"

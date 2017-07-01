@@ -44,12 +44,15 @@ selective =
     selective.log 'updating coverage count for test ' + test.title + '...'
     coverage = @getCurrentCoverage()
     selective.log 'coverage for test:\n' + JSON.stringify(coverage, null, 4)
-    @depsTree[test.title] = coverage
+    console.log test.parent.title
+    @depsTree[test.file] ?= {}
+    @depsTree[test.file][test.parent.title] ?= {}
+    @depsTree[test.file][test.parent.title][test.title] = coverage
     selective.log 'total coverage:\n' + JSON.stringify(@depsTree, null, 4)
 
   removeFromCoverage: (test) ->
     selective.log 'removing coverage count for test ' + test.title + '...'
-    delete @depsTree[test.title]
+    delete @depsTree[test.file]?[test.parent.title]?[test.title]
 
   getCurrentCoverage: ->
     return if typeof __coverage__ == 'undefined'
@@ -85,11 +88,13 @@ selective =
     selective.log 'deps tree:\n' + JSON.stringify(@depsTree, null, 4)
     selective.log 'changed files:\n' + JSON.stringify(changedFiles, null, 4)
 
-    for test of @depsTree
-      @testsToRun[test] = false
-      for file of @depsTree[test]
-        if changedFiles[@depsTree[test][file]]
-          @testsToRun[test] = true
+    for testFile of @depsTree
+      for parent of @depsTree[testFile]
+        for test of @depsTree[testFile][parent]
+          @testsToRun[test] = false
+          for file of @depsTree[testFile][parent][test]
+            if changedFiles[@depsTree[testFile][parent][test][file]]
+              @testsToRun[test] = true
 
     selective.log 'tests to run\n' + JSON.stringify(@testsToRun, null, 4)
   

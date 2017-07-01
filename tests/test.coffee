@@ -12,31 +12,34 @@ describe 'selective test execution', ->
     results = runTests('aut_passing_tests.coffee')
     assert results.indexOf('3 passing') != -1, 'expected all tests to run because deps file does not exist yet'
     assert fs.existsSync(consts.depsFile), 'expected ' + consts.depsFile + ' to exist'
-    deps = fs.readFileSync(consts.depsFile).toString()
+    deps = JSON.parse(fs.readFileSync(consts.depsFile))
+    result = deps[Object.keys(deps)[0]]
 
-    assert.equal deps, JSON.stringify({
-      'should show a,b,c,e': [
-        'tests/aut/aut_passing_tests.coffee'
-        'tests/aut/a.coffee'
-        'tests/aut/b.coffee'
-        'tests/aut/c.coffee'
-        'tests/aut/e.coffee'
-      ]
-      'should show a,b,c,e again': [
-        'tests/aut/aut_passing_tests.coffee'
-        'tests/aut/a.coffee'
-        'tests/aut/b.coffee'
-        'tests/aut/c.coffee'
-        'tests/aut/e.coffee'
-      ]
-      'should show a,b,d,e': [
-        'tests/aut/aut_passing_tests.coffee'
-        'tests/aut/a.coffee'
-        'tests/aut/b.coffee'
-        'tests/aut/e.coffee'
-        'tests/aut/d.coffee'
-      ]
-    }, null, 4), 'deps file does not contain expected content'
+    assert.deepEqual result, {
+      'c':
+        'should show a,b,c,e': [
+          'tests/aut/aut_passing_tests.coffee'
+          'tests/aut/a.coffee'
+          'tests/aut/b.coffee'
+          'tests/aut/c.coffee'
+          'tests/aut/e.coffee'
+        ]
+        'should show a,b,c,e again': [
+          'tests/aut/aut_passing_tests.coffee'
+          'tests/aut/a.coffee'
+          'tests/aut/b.coffee'
+          'tests/aut/c.coffee'
+          'tests/aut/e.coffee'
+        ]
+      'd':
+        'should show a,b,d,e': [
+          'tests/aut/aut_passing_tests.coffee'
+          'tests/aut/a.coffee'
+          'tests/aut/b.coffee'
+          'tests/aut/e.coffee'
+          'tests/aut/d.coffee'
+        ]
+    }, 'deps file does not contain expected content'
     
     results = runTests('aut_passing_tests.coffee')
     assert results.indexOf('0 passing') != -1, 'expected no tests to run because no code changes have been made'
@@ -58,18 +61,18 @@ describe 'selective test execution', ->
     assert.notEqual deps.indexOf('should pass'), -1, 'deps file does not contain expected content'
     assert.equal deps.indexOf('should fail'), -1, 'deps file does not contain expected content'
 
-  it 'should add/delete dependencies to existing tests that run again', ->
-    #abuse the limitation that tests with same name in different files are considered the same test...
+  it 'should distinguish between tests with the same name', ->
     runTests 'aut_tests_duplicate1.coffee'
-    deps1 = fs.readFileSync(consts.depsFile).toString()
-    assert.notEqual deps1.indexOf('a.coffee'), -1, 'deps file does not contain expected content'
-    assert.notEqual deps1.indexOf('c.coffee'), -1, 'deps file does not contain expected content'
-    assert.equal deps1.indexOf('d.coffee'), -1, 'deps file does not contain expected content'
     runTests 'aut_tests_duplicate2.coffee', 'modified:   tests/aut/a.coffee'
-    deps2 = fs.readFileSync(consts.depsFile).toString()
-    assert.notEqual deps2.indexOf('a.coffee'), -1, 'deps file does not contain expected content'
-    assert.equal deps2.indexOf('c.coffee'), -1, 'deps file does not contain expected content'
-    assert.notEqual deps2.indexOf('d.coffee'), -1, 'deps file does not contain expected content'
+    deps = JSON.parse(fs.readFileSync(consts.depsFile))
+    result1 = JSON.stringify(deps[Object.keys(deps)[0]])
+    result2 = JSON.stringify(deps[Object.keys(deps)[1]])
+    assert.notEqual result1.indexOf('a.coffee'), -1, 'deps file does not contain expected content'
+    assert.notEqual result1.indexOf('c.coffee'), -1, 'deps file does not contain expected content'
+    assert.equal result1.indexOf('d.coffee'), -1, 'deps file does not contain expected content'
+    assert.notEqual result2.indexOf('a.coffee'), -1, 'deps file does not contain expected content'
+    assert.equal result2.indexOf('c.coffee'), -1, 'deps file does not contain expected content'
+    assert.notEqual result2.indexOf('d.coffee'), -1, 'deps file does not contain expected content'
 
   it 'should run a test if its test file has changed', ->
     `var results`
@@ -80,6 +83,6 @@ describe 'selective test execution', ->
 
 runTests = (file, gitstatus) ->
   gitstatus = gitstatus or ' '
-  cmd = "gitstatus=\"#{gitstatus}\" ./node_modules/mocha/bin/mocha ./first.coffee ./tests/aut/#{file} --compilers coffee:coffee-script/register --verbose"
+  cmd = "gitstatus=\"#{gitstatus}\" ./node_modules/mocha/bin/mocha ./first.coffee ./tests/aut/#{file} --compilers coffee:coffee-script/register"
   res = execSync.stdout(cmd)
   res  

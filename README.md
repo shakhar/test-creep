@@ -66,8 +66,6 @@ test-creep-coffee sweet spot is in long running test suites, where it can save m
 
 * test-creep-coffee cannot detect changes in global contexts. For example, if you have a one time global initialization of a dictionary, and some tests use this dictionary, then test-creep-coffee will not mark these tests as dirty if there is a change in the initialization code. 
 
-* Tests should have unique names even if they reside in different files/suites.
-
 
 ## Troubleshooting
 At any moment you can run mocha without the 'first.coffee' parameter in which case mocha runs all tests as normal.

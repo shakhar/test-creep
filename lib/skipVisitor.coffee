@@ -3,7 +3,7 @@
 #
 
 _ = require 'lodash'
-NodeWrapper = require './NodeWrapper'
+NodeWrapper = require './nodeWrapper'
 
 PRAGMA_PREFIX = '!pragma'
 

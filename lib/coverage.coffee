@@ -68,8 +68,8 @@ hookRequire = (verbose) ->
     res
 
   transformFn = (source, fileName, options={}) =>
-    result = instrumenter.instrumentCoffee.call(instrumenter, fileName, source, options);
-    return result.init + result.js;
+    result = instrumenter.instrumentCoffee.call instrumenter, fileName, source, options
+    return result.init + result.js
 
   hook.hookRequire matchFn, transformFn, { extensions: [".coffee"] }
   return

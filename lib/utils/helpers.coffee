@@ -5,8 +5,6 @@ _            = require 'lodash'
 {EXTENSIONS} = require '../constants'
 minimatch    = require 'minimatch'
 
-exports.stripLeadingDotOrSlash = (pathName) -> pathName.replace(/^\//, "").replace(/^\.\//, "")
-
 # Get details about a file.  Returns a fs.Stats object, or null if the file does not exist.
 exports.statFile = statFile = (file) ->
     if !fs.existsSync(file) then return null

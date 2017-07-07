@@ -7,9 +7,11 @@
   },
   "author": "Shakhar Arad shakhar4@gmail.com",
   "dependencies": {
-    "execSync": "0.0.3",
+    "coffee-script": ">=1.6.2",
+    "execSync": "^0.0.3",
     "istanbul": "^0.4.5",
-    "lodash": "^4.17.4"
+    "lodash": "^4.17.4",
+    "minimatch": "^3.0.2"
   },
   "peerDependencies": {
     "mocha": ">=1.8.1"
@@ -33,7 +35,7 @@
     }
   ],
   "scripts": {
-    "test": "./node_modules/mocha/bin/mocha ./tests --compilers coffee:coffee-script/register"
+    "test": "./node_modules/mocha/bin/mocha ./tests --compilers coffee:coffee-script/register -t 10000"
   },
   "devDependencies": {
     "istanbul": "^0.4.5",

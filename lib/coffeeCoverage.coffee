@@ -13,15 +13,11 @@ path         = require 'path'
 coffeeScript = require 'coffee-script'
 _            = require 'lodash'
 
-NodeWrapper                     = require './NodeWrapper'
+NodeWrapper                     = require './nodeWrapper'
 {mkdirs, statFile, excludeFile} = require './utils/helpers'
 {EXTENSIONS}                    = require './constants'
-SkipVisitor                     = require './SkipVisitor'
-
-exports.INSTRUMENTORS = INSTRUMENTORS = {
-    jscoverage: require './instrumentors/JSCoverage'
-    istanbul:   require './instrumentors/Istanbul'
-}
+SkipVisitor                     = require './skipVisitor'
+IstanbulInstrumentors           = require './istanbulInstrumentor'
 
 class CoverageError extends Error
     constructor: (@message) ->
@@ -34,13 +30,6 @@ factoryDefaults =
     exclude: []
     recursive: true
     bare: false
-    instrumentor: 'istanbul'
-
-exports.getInstrumentorClass = getInstrumentorClass = (instrumentorName) ->
-    instrumentor = INSTRUMENTORS[instrumentorName]
-    if !instrumentor
-        throw new Error "Invalid instrumentor #{instrumentorName}. Valid options are: #{Object.keys(INSTRUMENTORS).join ', '}"
-    return instrumentor
 
 #### CoverageInstrumentor
 #
@@ -53,7 +42,7 @@ class exports.CoverageInstrumentor extends events.EventEmitter
     #
     constructor: (options = {}) ->
         @defaultOptions = _.defaults {}, options, factoryDefaults
-        _.defaults @defaultOptions, getInstrumentorClass(@defaultOptions.instrumentor).getDefaultOptions()
+        _.defaults @defaultOptions, IstanbulInstrumentors.getDefaultOptions()
 
     # Write a string to a file.
     writeToFile = (outFile, content) ->
@@ -282,8 +271,7 @@ class exports.CoverageInstrumentor extends events.EventEmitter
 
         effectiveOptions.log?.info "Instrumenting #{fileName}"
 
-        instrumentorConstructor = getInstrumentorClass effectiveOptions.instrumentor
-        instrumentor = new instrumentorConstructor(fileName, source, effectiveOptions)
+        instrumentor = new IstanbulInstrumentors(fileName, source, effectiveOptions)
 
         result = exports._runInstrumentor instrumentor, fileName, source, effectiveOptions
 

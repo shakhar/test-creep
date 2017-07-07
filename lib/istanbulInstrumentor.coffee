@@ -55,9 +55,9 @@
 
 assert = require 'assert'
 _ = require 'lodash'
-NodeWrapper = require '../NodeWrapper'
-{toQuotedString} = require '../utils/helpers'
-{compareLocations, fileToLines, minLocation} = require '../utils/codeUtils'
+NodeWrapper = require './nodeWrapper'
+{toQuotedString} = require './utils/helpers'
+{compareLocations, fileToLines, minLocation} = require './utils/codeUtils'
 
 nodeToLocation = (node) ->
     # Istanbul uses 1-based lines, but 0-based columns

@@ -44,7 +44,6 @@ selective =
     selective.log 'updating coverage count for test ' + test.title + '...'
     coverage = @getCurrentCoverage()
     selective.log 'coverage for test:\n' + JSON.stringify(coverage, null, 4)
-    console.log test.parent.title
     @depsTree[test.file] ?= {}
     @depsTree[test.file][test.parent.title] ?= {}
     @depsTree[test.file][test.parent.title][test.title] = coverage
